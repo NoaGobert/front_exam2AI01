@@ -1,17 +1,22 @@
 import { Button } from '@/components/Button';
+import { Spinner } from '@/components/Spinner';
 import { Table } from '@/components/Table';
 import { api } from '@/utils/api';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 export const AlbumsTable = () => {
   const navigate = useNavigate();
   const [albums, setAlbums] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAlbums = async () => {
+      setLoading(true);
       const response = await api.get('/albums');
       const { data } = response.data;
       setAlbums(data);
+      setLoading(false);
     };
     fetchAlbums();
   }, []);
@@ -51,13 +56,13 @@ export const AlbumsTable = () => {
   const actions = [
     {
       label: 'Delete',
-      className: 'bg-red-500 hover:bg-red-600',
+      className: 'bg-red-600 hover:bg-red-700',
       onClick: id => handleDelete(id),
       condition: row => !row.deleted_at,
     },
     {
       label: 'Restore',
-      className: 'bg-green-500 hover:bg-green-600',
+      className: 'bg-indigo-500 hover:bg-indigo-600',
       onClick: id => handleRestore(id),
       condition: row => row.deleted_at,
     },
@@ -68,7 +73,7 @@ export const AlbumsTable = () => {
       <div className="p-4 bg-gray-50 border-t border-gray-200">
         <div className="flex justify-between items-end mb-2">
           <h4 className=" font-semibold text-gray-700 ">
-            Tracks for <span className="text-indigo-600">{album.title}</span>
+            Tracks for <span className="text-pink-400">{album.title}</span>
           </h4>
           <Button onClick={handleAddTrack}>Add Track</Button>
         </div>
@@ -92,16 +97,22 @@ export const AlbumsTable = () => {
   };
 
   return (
-    <Table
-      columns={columns}
-      data={albums}
-      actions={actions}
-      onRowClick={handleRowClick}
-      expandedRowRender={expandedRowRender}
-      expandButtonLabel={{
-        collapsed: 'Show Tracks',
-        expanded: 'Hide Tracks',
-      }}
-    />
+    <div>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <Table
+          columns={columns}
+          data={albums}
+          actions={actions}
+          onRowClick={handleRowClick}
+          expandedRowRender={expandedRowRender}
+          expandButtonLabel={{
+            collapsed: 'Show Tracks',
+            expanded: 'Hide Tracks',
+          }}
+        />
+      )}
+    </div>
   );
 };

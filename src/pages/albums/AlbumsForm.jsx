@@ -6,7 +6,7 @@ export const AlbumsForm = () => {
 
   return (
     <>
-      <h1 className="text-xl text-center">{id ? 'Edit' : 'Add'} Album</h1>
+      <h1 className="text-xl text-center mb-4">{id ? 'Edit' : 'Add'} Album</h1>
 
       <AlbumsSubmit />
     </>

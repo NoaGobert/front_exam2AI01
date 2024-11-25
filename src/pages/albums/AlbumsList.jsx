@@ -5,12 +5,12 @@ export const AlbumsList = () => {
   return (
     <>
       <div className="flex justify-between items-center mb-5">
-        <h1 className="text-xl font-bold">Liste des Albums</h1>
+        <h1 className="text-xl font-bold">Albums List</h1>
         <Link
           to="/albums/add"
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700"
+          className="bg-pink-400 text-white font-bold py-2 px-4 rounded hover:bg-pink-500"
         >
-          Ajouter un Album
+          Add Album
         </Link>
       </div>
       <AlbumsTable />
