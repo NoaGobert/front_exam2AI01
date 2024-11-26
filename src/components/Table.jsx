@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn';
 import React, { useState } from 'react';
-import { FaTrash, FaUndo } from 'react-icons/fa';
+import { FaSortDown, FaSortUp, FaTrash, FaUndo } from 'react-icons/fa';
 import { Button } from './Button';
 
 export const Table = ({
@@ -13,6 +13,8 @@ export const Table = ({
 }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState('id');
+  const [sortOrder, setSortOrder] = useState('desc');
   const rowsPerPage = 50;
 
   const toggleExpandRow = rowId => {
@@ -27,7 +29,22 @@ export const Table = ({
     setCurrentPage(prevPage => Math.max(prevPage - 1, 1));
   };
 
-  const paginatedData = data.slice(
+  const handleSort = field => {
+    const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortOrder(order);
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortField) return 0;
+    const aValue = sortField.split('.').reduce((o, i) => o[i], a);
+    const bValue = sortField.split('.').reduce((o, i) => o[i], b);
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const paginatedData = sortedData.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage,
   );
@@ -40,9 +57,18 @@ export const Table = ({
             {columns.map((col, index) => (
               <th
                 key={index}
-                className="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase"
+                className="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase cursor-pointer"
+                onClick={() => handleSort(col.accessor)}
               >
-                {col.header}
+                <div className={cn('flex gap-1 items-center')}>
+                  {col.header}
+
+                  {sortField === col.accessor && (
+                    <span>
+                      {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
+                    </span>
+                  )}
+                </div>
               </th>
             ))}
             <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">

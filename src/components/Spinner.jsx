@@ -1,9 +1,10 @@
-import { CgSpinner } from 'react-icons/cg';
+import { cn } from '@/utils/cn';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
-export const Spinner = () => {
+export const Spinner = ({ className }) => {
   return (
-    <div className="flex justify-center items-center h-64">
-      <CgSpinner className="animate-spin text-4xl text-pink-400" />
+    <div className={cn('flex justify-center items-center p-2', className)}>
+      <AiOutlineLoading3Quarters className="animate-spin text-4xl  text-pink-400" />
     </div>
   );
 };

@@ -99,7 +99,7 @@ export const AlbumsTable = () => {
   return (
     <div>
       {loading ? (
-        <Spinner />
+        <Spinner className="h-64" />
       ) : (
         <Table
           columns={columns}
