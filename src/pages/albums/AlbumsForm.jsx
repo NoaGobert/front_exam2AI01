@@ -34,8 +34,8 @@ export const AlbumsForm = () => {
         try {
           const { data } = await api.get(`/albums/${id}`);
           setAlbum(data.data);
-        } catch {
-          toast.error('Error fetching album');
+        } catch (error) {
+          handleError(error);
         } finally {
           setLoading(false);
         }

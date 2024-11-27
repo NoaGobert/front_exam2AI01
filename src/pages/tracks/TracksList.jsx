@@ -7,7 +7,7 @@ export const TracksList = () => {
   return (
     <>
       <div className="flex justify-between items-center mb-5">
-        <h1 className="text-xl font-bold">Liste des Tracks</h1>
+        <h1 className="text-xl font-bold">Tracks List</h1>
         <Button onClick={() => navigate('/tracks/add')}>Add Track</Button>
       </div>
       <TracksTable />
