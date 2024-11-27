@@ -1,3 +1,4 @@
+import { cn } from '@/utils/cn';
 import React, { useState } from 'react';
 import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import { Button } from './Button';
@@ -73,15 +74,19 @@ export const Table = ({
           {paginatedData.map((row, rowIndex) => (
             <React.Fragment key={row.id || rowIndex}>
               <tr
-                className={`border-t border-gray-200 hover:bg-gray-100 ${
-                  rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                }`}
+                className={cn(
+                  'border-t border-gray-200 hover:bg-gray-100 ',
+                  rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white',
+                )}
                 onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
-                    className="px-4 py-2 text-sm text-gray-700"
+                    className={cn(
+                      'px-4  text-sm text-gray-700 cursor-pointer',
+                      col.extend ? 'py-0' : 'py-3',
+                    )}
                   >
                     {col.extend ? (
                       col.condition ? (
@@ -100,7 +105,7 @@ export const Table = ({
                         )
                       ) : (
                         <Button
-                          className="text-white bg-gray-600 hover:bg-gray-700 w-fit py-1 px-2 rounded transition-colors duration-300"
+                          className="text-white bg-gray-600 hover:bg-gray-700 w-fit py-1  px-2 rounded transition-colors duration-300"
                           onClick={e => {
                             e.stopPropagation();
                             toggleExpandRow(row.id);

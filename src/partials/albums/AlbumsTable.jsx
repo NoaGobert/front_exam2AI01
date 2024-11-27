@@ -14,9 +14,8 @@ export const AlbumsTable = () => {
   useEffect(() => {
     const fetchAlbums = async () => {
       setLoading(true);
-      const response = await api.get('/albums');
-      const { data } = response.data;
-      setAlbums(data);
+      const { data } = await api.get('/albums');
+      setAlbums(data.data);
       setLoading(false);
     };
     fetchAlbums();

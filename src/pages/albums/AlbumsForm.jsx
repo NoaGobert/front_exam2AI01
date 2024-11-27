@@ -69,7 +69,7 @@ export const AlbumsForm = () => {
 
   const validationSchema = Yup.object({
     title: Yup.string().required('Title is required'),
-    artist_id: Yup.string().required('Artist is required'),
+    artist_id: Yup.number().required('Artist is required'),
   });
 
   return (
