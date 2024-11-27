@@ -3,6 +3,7 @@ import { Spinner } from '@/components/Spinner';
 import { Table } from '@/components/Table';
 import { api } from '@/utils/api';
 import { useEffect, useState } from 'react';
+import { FaTrash, FaTrashRestore } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 export const AlbumsTable = () => {
@@ -23,7 +24,13 @@ export const AlbumsTable = () => {
 
   const handleDelete = async id => {
     await api.delete(`/albums/${id}`);
-    setAlbums(albums.filter(album => album.id !== id));
+    setAlbums(
+      albums.map(album =>
+        album.id === id
+          ? { ...album, deleted_at: new Date().toISOString() }
+          : album,
+      ),
+    );
   };
 
   const handleRestore = async id => {
@@ -36,6 +43,7 @@ export const AlbumsTable = () => {
   };
 
   const handleRowClick = album => {
+    if (album.deleted_at) return;
     navigate(`/albums/${album.id}/edit`);
   };
 
@@ -47,32 +55,11 @@ export const AlbumsTable = () => {
     navigate('/tracks/add');
   };
 
-  const columns = [
-    { accessor: 'id', header: '#' },
-    { accessor: 'title', header: 'Title' },
-    { accessor: 'artist.name', header: 'Artist' },
-  ];
-
-  const actions = [
-    {
-      label: 'Delete',
-      className: 'bg-red-600 hover:bg-red-700',
-      onClick: id => handleDelete(id),
-      condition: row => !row.deleted_at,
-    },
-    {
-      label: 'Restore',
-      className: 'bg-indigo-500 hover:bg-indigo-600',
-      onClick: id => handleRestore(id),
-      condition: row => row.deleted_at,
-    },
-  ];
-
   const expandedRowRender = album => {
     return (
       <div className="p-4 bg-gray-50 border-t border-gray-200">
         <div className="flex justify-between items-end mb-2">
-          <h4 className=" font-semibold text-gray-700 ">
+          <h4 className="font-semibold text-gray-700">
             Tracks for <span className="text-pink-400">{album.title}</span>
           </h4>
           <Button onClick={handleAddTrack}>Add Track</Button>
@@ -95,6 +82,32 @@ export const AlbumsTable = () => {
       </div>
     );
   };
+  const columns = [
+    { accessor: 'id', header: '#' },
+    { accessor: 'title', header: 'Title' },
+    { accessor: 'artist.name', header: 'Artist' },
+    {
+      header: 'Actions',
+      element: row => (
+        <div className="flex items-center gap-2 ">
+          {!row.deleted_at ? (
+            <span onClick={e => (e.stopPropagation(), handleDelete(row.id))}>
+              <FaTrash className="size-5" />
+            </span>
+          ) : (
+            <span onClick={e => (e.stopPropagation(), handleRestore(row.id))}>
+              <FaTrashRestore className="size-5" />
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: 'Tracks',
+      element: expandedRowRender,
+      extend: true,
+    },
+  ];
 
   return (
     <div>
@@ -104,7 +117,6 @@ export const AlbumsTable = () => {
         <Table
           columns={columns}
           data={albums}
-          actions={actions}
           onRowClick={handleRowClick}
           expandedRowRender={expandedRowRender}
           expandButtonLabel={{

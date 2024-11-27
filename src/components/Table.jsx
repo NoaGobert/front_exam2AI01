@@ -1,15 +1,12 @@
-import { cn } from '@/utils/cn';
 import React, { useState } from 'react';
-import { FaSortDown, FaSortUp, FaTrash, FaUndo } from 'react-icons/fa';
+import { FaSortDown, FaSortUp } from 'react-icons/fa';
 import { Button } from './Button';
 
 export const Table = ({
   columns,
   data,
-  actions,
-  expandedRowRender,
-  onRowClick,
   expandButtonLabel = { collapsed: 'Expand', expanded: 'Collapse' },
+  onRowClick,
 }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,7 +19,7 @@ export const Table = ({
   };
 
   const handleNextPage = () => {
-    setCurrentPage(prevPage => prevPage + 1);
+    setCurrentPage(currentPage + 1);
   };
 
   const handlePreviousPage = () => {
@@ -37,8 +34,8 @@ export const Table = ({
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortField) return 0;
-    const aValue = sortField.split('.').reduce((o, i) => o[i], a);
-    const bValue = sortField.split('.').reduce((o, i) => o[i], b);
+    const aValue = sortField.split('.').reduce((o, i) => o?.[i], a);
+    const bValue = sortField.split('.').reduce((o, i) => o?.[i], b);
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
@@ -53,16 +50,15 @@ export const Table = ({
     <div className="overflow-x-auto rounded-xl shadow-md p-4 bg-white">
       <table className="min-w-full bg-white ring ring-gray-200 rounded-lg overflow-hidden">
         <thead>
-          <tr className="bg-gray-100 ">
+          <tr className="bg-gray-100">
             {columns.map((col, index) => (
               <th
                 key={index}
                 className="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase cursor-pointer"
-                onClick={() => handleSort(col.accessor)}
+                onClick={() => col.accessor && handleSort(col.accessor)}
               >
-                <div className={cn('flex gap-1 items-center')}>
+                <div className="flex gap-1 items-center">
                   {col.header}
-
                   {sortField === col.accessor && (
                     <span>
                       {sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />}
@@ -71,94 +67,65 @@ export const Table = ({
                 </div>
               </th>
             ))}
-            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">
-              Actions
-            </th>
           </tr>
         </thead>
         <tbody>
           {paginatedData.map((row, rowIndex) => (
             <React.Fragment key={row.id || rowIndex}>
-              {/* Main Row */}
               <tr
-                className={cn(
-                  'border-t border-gray-200 hover:bg-gray-100 cursor-pointer',
-                  rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white',
-                )}
-                onClick={() => onRowClick(row)}
+                className={`border-t border-gray-200 hover:bg-gray-100 ${
+                  rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                }`}
+                onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
                     className="px-4 py-2 text-sm text-gray-700"
                   >
-                    {col.accessor.split('.').reduce((o, i) => o[i], row)}
-                  </td>
-                ))}
-                <td
-                  className={cn(
-                    'p-4 text-sm text-gray-700 flex items-center gap-3',
-                  )}
-                >
-                  {/* Expand Button */}
-                  {expandedRowRender && (
-                    <Button
-                      className="bg-gray-600 hover:bg-gray-700"
-                      onClick={e => {
-                        e.stopPropagation();
-                        toggleExpandRow(row.id);
-                      }}
-                    >
-                      {expandedRow === row.id
-                        ? expandButtonLabel.expanded
-                        : expandButtonLabel.collapsed}
-                    </Button>
-                  )}
-
-                  {/* Row Actions */}
-                  {actions?.length > 0 &&
-                    actions
-                      .filter(
-                        action => !action.condition || action.condition(row),
-                      )
-                      .map((action, actionIndex) => (
-                        <span
-                          key={actionIndex}
+                    {col.extend ? (
+                      col.condition ? (
+                        col.condition(row) && (
+                          <Button
+                            className="text-white w-fit py-1 px-2 rounded transition-colors duration-300"
+                            onClick={e => {
+                              e.stopPropagation();
+                              toggleExpandRow(row.id);
+                            }}
+                          >
+                            {expandedRow === row.id
+                              ? expandButtonLabel.expanded
+                              : expandButtonLabel.collapsed}
+                          </Button>
+                        )
+                      ) : (
+                        <Button
+                          className="text-white bg-gray-600 hover:bg-gray-700 w-fit py-1 px-2 rounded transition-colors duration-300"
                           onClick={e => {
                             e.stopPropagation();
-                            action.onClick(row.id);
+                            toggleExpandRow(row.id);
                           }}
-                          className={cn(
-                            'px-3 py-1 rounded w-12 flex items-center justify-center',
-                          )}
                         >
-                          {action.label === 'Delete' ? (
-                            <FaTrash />
-                          ) : action.label === 'Restore' ? (
-                            <FaUndo />
-                          ) : (
-                            action.label
-                          )}
-                        </span>
-                      ))}
-                </td>
+                          {expandedRow === row.id
+                            ? expandButtonLabel.expanded
+                            : expandButtonLabel.collapsed}
+                        </Button>
+                      )
+                    ) : col.accessor ? (
+                      col.accessor.split('.').reduce((o, i) => o?.[i], row)
+                    ) : (
+                      col.element?.(row)
+                    )}
+                  </td>
+                ))}
               </tr>
-
-              {/* Expanded Row */}
-              {expandedRow === row.id && expandedRowRender && (
+              {expandedRow === row.id && (
                 <tr>
                   <td
-                    colSpan={columns.length + 1}
+                    colSpan={columns.length}
                     className="bg-gray-50 p-0 transition-all duration-300 rounded-b-lg"
                   >
-                    <div
-                      className={cn(
-                        'p-4 transition-opacity duration-300',
-                        expandedRow === row.id ? 'opacity-100' : 'opacity-0',
-                      )}
-                    >
-                      {expandedRowRender(row)}
-                    </div>
+                    {columns.find(col => col.extend)?.element(row)}
                   </td>
                 </tr>
               )}
