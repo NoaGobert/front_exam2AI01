@@ -1,6 +1,8 @@
 import { Root } from '@/components/Root';
 import { AlbumsForm } from '@/pages/albums/AlbumsForm';
 import { AlbumsList } from '@/pages/albums/AlbumsList';
+import { ArtistsForm } from '@/pages/artists/ArtistsForm';
+import { ArtistsList } from '@/pages/artists/ArtistsList';
 import { GenresForm } from '@/pages/genres/GenresForm';
 import { GenresList } from '@/pages/genres/GenresList';
 import { TracksForm } from '@/pages/tracks/TracksForm';
@@ -52,6 +54,20 @@ export const router = createBrowserRouter(
         {
           path: '/tracks/:id/edit',
           element: <TracksForm />,
+        },
+
+        // artists
+        {
+          path: '/artists',
+          element: <ArtistsList />,
+        },
+        {
+          path: '/artists/add',
+          element: <ArtistsForm />,
+        },
+        {
+          path: '/artists/:id/edit',
+          element: <ArtistsForm />,
         },
       ],
     },
