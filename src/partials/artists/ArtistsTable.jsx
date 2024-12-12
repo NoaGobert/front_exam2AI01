@@ -61,7 +61,7 @@ export const ArtistsTable = () => {
           <h4 className="font-semibold text-gray-700">
             Albums for <span className="text-pink-400">{artist.name}</span>
           </h4>
-          <Button onClick={handleAddAlbum}>Add Track</Button>
+          <Button onClick={handleAddAlbum}>Add Album</Button>
         </div>
         {artist.albums && artist.albums.length > 0 ? (
           <ul className="space-y-1">
